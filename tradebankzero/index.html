@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bank Zero | Borsa Privata ZeroRoleplay</title>
+    <!-- Chart.js per i grafici delle quotazioni -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0b1120;
+            --bg-card: #151e32;
+            --bg-card-hover: #1c2842;
+            --primary: #4a7288;
+            --primary-hover: #385c72;
+            --primary-glow: rgba(74, 114, 136, 0.35);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.25);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #24324d;
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(74, 114, 136, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+        }
+
+        .disclaimer-top-bar {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .disclaimer-top-bar i { color: var(--warning); }
+
+        nav {
+            background-color: rgba(21, 30, 50, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            font-size: 1.3rem;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-telegram {
+            background: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%);
+            color: white;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(42, 171, 238, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, rgba(21, 30, 50, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: rgba(74, 114, 136, 0.2);
+            color: #7dd3fc;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(74, 114, 136, 0.4);
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 40%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        .notice-box {
+            background-color: rgba(245, 158, 11, 0.08);
+            border-left: 4px solid var(--warning);
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin: 1.5rem 0 2rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .notice-box i { font-size: 1.4rem; color: var(--warning); margin-top: 0.1rem; }
+        .notice-box p { color: #fef08a; font-size: 0.95rem; line-height: 1.5; margin: 0; }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.8rem;
+            border-radius: var(--radius);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(74, 114, 136, 0.15);
+            color: #38bdf8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .direzione-header { text-align: center; margin-bottom: 3rem; }
+        .direzione-header h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .direzione-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .direttore-single-card {
+            max-width: 420px;
+            margin: 0 auto 2.5rem auto;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 30px var(--primary-glow);
+        }
+
+        .vice-direttori-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .vice-direttori-grid { grid-template-columns: 1fr; }
+        }
+
+        .direzione-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.2rem;
+        }
+
+        .avatar-box {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #38bdf8;
+            margin-bottom: 1rem;
+        }
+
+        .direttore-single-card .avatar-box {
+            border-color: var(--primary);
+            color: var(--primary);
+            width: 90px;
+            height: 90px;
+            font-size: 2.5rem;
+        }
+
+        .role-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .direttore-single-card .role-badge {
+            background-color: var(--primary-glow);
+            color: #7dd3fc;
+        }
+
+        .person-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+
+        th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .positive { color: #34d399; font-weight: 700; }
+        .negative { color: #f87171; font-weight: 700; }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 520px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-large { max-width: 750px; }
+
+        .close-btn {
+            position: absolute;
+            top: 1.25rem; right: 1.25rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sede-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: var(--bg-card);
+            border: 1px dashed var(--border-color);
+            border-radius: 20px;
+        }
+
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+
+        .admin-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.8rem;
+        }
+
+        .admin-box h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #38bdf8;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .code-pill {
+            background-color: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            font-family: monospace;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-size: 1.05rem;
+        }
+
+        .date-pill {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .note-input {
+            width: 100%;
+            min-height: 40px;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #0f172a;
+            color: var(--text-main);
+            resize: vertical;
+        }
+
+        /* NOTIFICHE TOAST PERSONALIZZATE */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast-card {
+            pointer-events: auto;
+            width: 340px;
+            background-color: #151e32;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            animation: toastIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .toast-card.hide {
+            animation: toastOut 0.3s ease forwards;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(100%) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        .toast-content {
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        .toast-icon { font-size: 1.3rem; flex-shrink: 0; }
+        .toast-body { flex-grow: 1; }
+        .toast-title { font-size: 0.9rem; font-weight: 700; color: white; margin-bottom: 0.15rem; }
+        .toast-message { font-size: 0.82rem; color: var(--text-muted); line-height: 1.3; }
+
+        .toast-progress {
+            height: 4px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--primary);
+            animation: progressTimer 5s linear forwards;
+        }
+
+        @keyframes progressTimer {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        .toast-success .toast-icon { color: #10b981; }
+        .toast-success .toast-progress-bar { background-color: #10b981; }
+        .toast-error .toast-icon { color: #ef4444; }
+        .toast-error .toast-progress-bar { background-color: #ef4444; }
+        .toast-warning .toast-icon { color: #f59e0b; }
+        .toast-warning .toast-progress-bar { background-color: #f59e0b; }
+        .toast-info .toast-icon { color: #38bdf8; }
+        .toast-info .toast-progress-bar { background-color: #38bdf8; }
+
+        .filter-btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .criteri-box {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        footer {
+            background-color: rgba(15, 23, 42, 0.9);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            padding: 1.8rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="disclaimer-top-bar">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span><strong>Avviso importante:</strong> Trading Bank Zero è un'azienda privata indipendente di ZeroRoleplay e non costituisce una banca statale ufficiale del server.</span>
+    </div>
+
+    <nav>
+        <div class="logo-container" onclick="showSection('chi-siamo')">
+            <div class="logo-icon-wrapper">
+                <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <span class="logo-title">TRADING BANK ZERO</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" id="link-chi-siamo" class="active" onclick="showSection('chi-siamo')">Chi Siamo</a></li>
+            <li><a href="#" id="link-criteri" onclick="showSection('criteri')">Criteri Valutazione</a></li>
+            <li><a href="#" id="link-quotazioni" onclick="showSection('quotazioni')">Quotazioni Borsa</a></li>
+            <li><a href="#" id="link-direzione" onclick="showSection('direzione')">La Direzione</a></li>
+            <li><a href="#" id="link-sede" onclick="showSection('sede')">La Nostra Sede</a></li>
+            <li id="nav-dashboard" style="display: none;"><a href="#" id="link-dashboard" onclick="showSection('dashboard')" style="color: #34d399;"><i class="fa-solid fa-chart-pie"></i> Area Personale</a></li>
+            <li id="nav-admin" style="display: none;"><a href="#" id="link-admin" onclick="showSection('admin')" style="color: #f59e0b;"><i class="fa-solid fa-user-shield"></i> Pannello Admin</a></li>
+        </ul>
+        <div class="auth-buttons" id="auth-buttons">
+            <button class="btn btn-outline" onclick="openModal('register-modal')"><i class="fa-solid fa-user-plus"></i> Registrati</button>
+            <button class="btn btn-primary" onclick="openModal('login-modal')"><i class="fa-solid fa-right-to-bracket"></i> Accedi</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- CHI SIAMO -->
+        <section id="chi-siamo" class="section active">
+            <div class="hero-card">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-shield-halved"></i> Azienda Privata di Gestione Borsa
+                </div>
+                <h1 class="hero-title">Investi nel futuro commerciale di ZeroCity</h1>
+                <p class="hero-subtitle">Trading Bank Zero è la piattaforma di riferimento per la quotazione e la compravendita di azioni societarie private in ZeroRoleplay. Diamo valore ai tuoi risparmi e offriamo capitale alle imprese in crescita.</p>
+                
+                <div class="notice-box">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p><strong>Dichiarazione di Trasparenza:</strong> Trading Bank Zero opera esclusivamente come impresa privata di intermediazione finanziaria e gestione di borsa. Non siamo affiliati né rappresentiamo una Banca Ufficiale di Stato di ZeroRoleplay.</p>
+                </div>
+
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <button class="btn btn-primary" onclick="showSection('quotazioni')"><i class="fa-solid fa-chart-line"></i> Esplora le Quotazioni</button>
+                    <button class="btn btn-warning" onclick="openModal('quote-request-modal')"><i class="fa-solid fa-building-circle-check"></i> Quota la tua Azienda in Borsa</button>
+                    <a href="https://t.me/TradingBankZero" target="_blank" class="btn btn-telegram">
+                        <i class="fa-brands fa-telegram"></i> GRUPPO TELEGRAM UFFICIALE
+                    </a>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--text-main);">Come funziona la Borsa Privata</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-building-user"></i></div>
+                    <h3>1. Quotazione Aziendale</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; line-height: 1.6;">Le migliori aziende private di ZeroCity richiedono la quotazione in borsa previa valutazione dei parametri di bilancio e di rischio.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <h3>2. Acquisto & Codice</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; line-height: 1.6;">I cittadini acquistano quote societarie dal sito e ricevono un codice d'acquisto unico con data e ora.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <h3>3. Report & Profitto</h3>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem; line-height: 1.6;">Segui i report settimanali nel gruppo Telegram ufficiale per monitorare le variazioni azionarie.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE CRITERI DI VALUTAZIONE -->
+        <section id="criteri" class="section">
+            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">Criteri di Valutazione Aziendale</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Trasparenza e parametri ufficiali adottati da Trading Bank Zero per calcolare il valore azionario delle imprese.</p>
+
+            <div class="criteri-box">
+                <h2 style="font-size: 1.5rem; color: #38bdf8; margin-bottom: 1rem;"><i class="fa-solid fa-scale-balanced"></i> Parametri di Bilancio e Crescita</h2>
+                <p style="color: var(--text-main); line-height: 1.7; margin-bottom: 1rem;">
+                    Per garantire stabilità e totale imparzialità al mercato finanziario di ZeroCity, Trading Bank Zero applica una valutazione rigorosa basata sui seguenti pilastri principali:
+                </p>
+
+                <div class="grid-3" style="margin-top:1rem; margin-bottom: 2.5rem;">
+                    <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
+                        <div class="card-icon" style="color:#10b981;"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <h3>1. Fatturato Aziendale</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">L'incasso complessivo ed effettivo registrato dall'impresa durante l'attività commerciale e professionale.</p>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
+                        <div class="card-icon" style="color:#f59e0b;"><i class="fa-solid fa-users-gear"></i></div>
+                        <h3>2. Organico e Dipendenti</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">La dimensione della forza lavoro regolarmente assunta e operativa sotto contratto nell'azienda.</p>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(56, 189, 248, 0.3);">
+                        <div class="card-icon" style="color:#38bdf8;"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3>3. Domanda Azionaria</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">Il volume di richiesta, compravendita e interesse dimostrato dagli investitori sul mercato.</p>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.5rem; color: #ef4444; margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Eventi Critici e Penalizzazioni di Mercato</h2>
+                <p style="color: var(--text-main); line-height: 1.7; margin-bottom: 1.5rem;">
+                    La Borsa Privata tiene conto degli eventi societari interni ed esterni. Determinati avvenimenti negativi o modifiche gestionali incidono sul valore azionario e provocano svalutazioni immediate:
+                </p>
+
+                <div class="grid-3" style="margin-top:1rem; margin-bottom: 2rem;">
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="card-icon" style="color:#ef4444; background: rgba(239, 68, 68, 0.15);"><i class="fa-solid fa-gavel"></i></div>
+                        <h3>Cause Penali e Legali</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">Processi giudiziari, indagini o denunce a carico dell'azienda o dei suoi dirigenti comportano un danno d'immagine e un crollo immediato della fiducia degli investitori.</p>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="card-icon" style="color:#f59e0b; background: rgba(245, 158, 11, 0.15);"><i class="fa-solid fa-tags"></i></div>
+                        <h3>Abbassamento dei Prezzi</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">Svalutazioni o tagli drastici del listino prezzi di beni e servizi riducono il margine di guadagno stimato, abbassando la valutazione azionaria dell'impresa.</p>
+                    </div>
+
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="card-icon" style="color:#ef4444; background: rgba(239, 68, 68, 0.15);"><i class="fa-solid fa-user-slash"></i></div>
+                        <h3>Licenziamento Dipendenti</h3>
+                        <p style="color: var(--text-muted); margin-top:0.5rem; line-height:1.5;">Tagli all'organico o licenziamenti improvvisi segnalano difficoltà operative o contrazione delle attività, riducendo l'indice di solidità societaria.</p>
+                    </div>
+                </div>
+
+                <div class="notice-box" style="background-color: rgba(56, 189, 248, 0.08); border-left-color: #38bdf8;">
+                    <i class="fa-solid fa-bullhorn" style="color:#38bdf8;"></i>
+                    <p style="color:#e0f2fe;">
+                        <strong>Pubblicazione Report Settimanali:</strong><br>
+                        Ogni settimana viene redatto e pubblicato il report ufficiale aggiornato contenente tutti i dati e le variazioni di mercato nel nostro canale ufficiale Telegram.
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <a href="https://t.me/TradingBankZero" target="_blank" class="btn btn-telegram" style="font-size: 1.1rem; padding: 0.9rem 2rem;">
+                        <i class="fa-brands fa-telegram"></i> GRUPPO TELEGRAM UFFICIALE
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUOTAZIONI -->
+        <section id="quotazioni" class="section">
+            <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Aziende Quotate in Borsa</h1>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Valutazioni e disponibilità azionaria in tempo reale.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Azienda</th>
+                            <th>Valutazione Totale</th>
+                            <th>Azioni Disponibili</th>
+                            <th>Prezzo Singola Azione</th>
+                            <th>Crescita Valutazione</th>
+                            <th>Grafico</th>
+                            <th>Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companies-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- LA DIREZIONE -->
+        <section id="direzione" class="section">
+            <div class="direzione-header">
+                <h1>La Direzione aziendale</h1>
+                <p>I responsabili e dirigenti della Trading Bank Zero</p>
+            </div>
+
+            <div class="card direzione-card direttore-single-card">
+                <div class="avatar-box"><i class="fa-solid fa-crown"></i></div>
+                <div class="role-badge">Direttore Generale</div>
+                <div class="person-name">vMeslate</div>
+                <a href="https://t.me/Meslate" target="_blank" class="btn btn-telegram">
+                    <i class="fa-brands fa-telegram"></i> CONTATTO TELEGRAM
+                </a>
+            </div>
+
+            <div class="vice-direttori-grid">
+                <div class="card direzione-card">
+                    <div class="avatar-box"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="role-badge">Vice Direttore</div>
+                    <div class="person-name">anfetamjnaa</div>
+                    <a href="https://t.me/compostabile" target="_blank" class="btn btn-telegram">
+                        <i class="fa-brands fa-telegram"></i> CONTATTO TELEGRAM
+                    </a>
+                </div>
+
+                <div class="card direzione-card">
+                    <div class="avatar-box"><i class="fa-solid fa-user-tie"></i></div>
+                    <div class="role-badge">Vice Direttore</div>
+                    <div class="person-name">Lucantros</div>
+                    <a href="https://t.me/lucaga789" target="_blank" class="btn btn-telegram">
+                        <i class="fa-brands fa-telegram"></i> CONTATTO TELEGRAM
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- LA NOSTRA SEDE -->
+        <section id="sede" class="section">
+            <div class="sede-container">
+                <div style="font-size: 3.5rem; color: var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-building-columns"></i></div>
+                <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.8rem;">La Nostra Sede a ZeroCity</h1>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem auto;">
+                    Stiamo ultimando la realizzazione del nostro quartier generale a ZeroCity.
+                </p>
+                <div class="hero-badge"><i class="fa-solid fa-clock"></i> Pagina momentaneamente vuota - Apertura Prossimamente</div>
+            </div>
+        </section>
+
+        <!-- AREA PERSONALE -->
+        <section id="dashboard" class="section">
+            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">Area Personale</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Benvenuto, <strong id="user-display-name" style="color: #38bdf8;">Utente</strong> (<span id="user-display-role">Investitore</span>).</p>
+
+            <div id="company-owner-panel" style="display: none; margin-bottom: 3rem;">
+                <div class="admin-box" style="border-color: #38bdf8;">
+                    <h2><i class="fa-solid fa-building-user"></i> Pannello Gestione Azienda Quotata: <span id="owner-company-name" style="color:white;">-</span></h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+                        <div class="card" style="padding: 1.2rem;">
+                            <label>Valutazione Attuale</label>
+                            <h3 id="owner-company-val" style="color: #34d399; font-size: 1.6rem; margin-top: 0.3rem;">€0</h3>
+                        </div>
+                        <div class="card" style="padding: 1.2rem;">
+                            <label>Prezzo Singola Azione</label>
+                            <h3 id="owner-company-price" style="color: #38bdf8; font-size: 1.6rem; margin-top: 0.3rem;">€0</h3>
+                        </div>
+                        <div class="card" style="padding: 1.2rem;">
+                            <label>Azioni Disponibili</label>
+                            <h3 id="owner-company-stocks" style="color: #f59e0b; font-size: 1.6rem; margin-top: 0.3rem;">0</h3>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.2rem; margin-bottom: 1rem; color: #38bdf8;"><i class="fa-solid fa-users"></i> Investitori che possiedono quote della tua Azienda</h3>
+                    <div class="table-responsive" style="margin-bottom: 2rem;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome Utente Investitore</th>
+                                    <th>Azioni Possedute</th>
+                                    <th>Valore Totale Investito</th>
+                                    <th>% Sulla Società</th>
+                                </tr>
+                            </thead>
+                            <tbody id="company-investors-table"></tbody>
+                        </table>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="showOwnerCompanyChart()"><i class="fa-solid fa-chart-line"></i> Visualizza Grafico Andamento Aziendale</button>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.4rem; margin-bottom: 1rem; color: #38bdf8;"><i class="fa-solid fa-boxes-stacked"></i> Il Tuo Portafoglio Azionario Personale</h2>
+            <div class="table-responsive" style="margin-bottom: 2.5rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Azienda</th>
+                            <th>Quantità Azioni Possedute</th>
+                            <th>Valore Attuale Singolo</th>
+                            <th>Valore Totale Stimato</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-portfolio-table"></tbody>
+                </table>
+            </div>
+
+            <h2 style="font-size: 1.4rem; margin-bottom: 1rem; color: #38bdf8;"><i class="fa-solid fa-receipt"></i> I Tuoi Codici Acquisto Emanati</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Codice (8 Cifre)</th>
+                            <th>Data e Ora</th>
+                            <th>Azienda</th>
+                            <th>Quantità</th>
+                            <th>Totale Importo</th>
+                            <th>Stato Pagamento</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-orders-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PANNELLO ADMIN -->
+        <section id="admin" class="section">
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #f59e0b; margin-bottom: 0.5rem;"><i class="fa-solid fa-user-shield"></i> Pannello Amministrazione</h1>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Gestione completa di aziende, utenti, azioni e codici d'acquisto.</p>
+
+            <div class="admin-grid">
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-plus-circle"></i> 1. Aggiungi Nuova Azienda in Borsa</h2>
+                    <form onsubmit="adminCreateCompany(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label>Nome Azienda</label>
+                                <input type="text" id="add-comp-name" placeholder="Es. ZeroMarket" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Valutazione Totale (€)</label>
+                                <input type="number" id="add-comp-val" placeholder="Es. 150000" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Azioni Disponibili</label>
+                                <input type="number" id="add-comp-stocks" placeholder="Es. 100" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Prezzo Singola Azione (€)</label>
+                                <input type="number" id="add-comp-price" placeholder="Es. 500" step="any" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success"><i class="fa-solid fa-plus"></i> Aggiungi Azienda</button>
+                    </form>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-user-tie"></i> 2. Assegna Titolarità Azienda a un Utente</h2>
+                    <form onsubmit="adminAssignCompanyOwner(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label>Seleziona Utente</label>
+                                <select id="owner-user-select" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Seleziona la sua Azienda Quotata</label>
+                                <select id="owner-company-select" required></select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-link"></i> Imposta come Titolare Azienda</button>
+                    </form>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-pen-to-square"></i> 3. Modifica Azienda Esistente</h2>
+                    <div class="form-group">
+                        <label>Seleziona l'Azienda da Modificare</label>
+                        <select id="edit-select-company" onchange="populateEditCompanyFields()">
+                        </select>
+                    </div>
+
+                    <form onsubmit="adminSubmitCompanyEdit(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label>Nome Azienda</label>
+                                <input type="text" id="edit-field-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nuova Valutazione Totale (€)</label>
+                                <input type="number" id="edit-field-val" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Azioni Disponibili</label>
+                                <input type="number" id="edit-field-stocks" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Prezzo Singola Azione (€)</label>
+                                <input type="number" id="edit-field-price" step="any" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning"><i class="fa-solid fa-floppy-disk"></i> Salva Modifiche Azienda</button>
+                    </form>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-trash-can"></i> 4. Rimuovi Azienda dalla Borsa</h2>
+                    <form onsubmit="adminSubmitCompanyDelete(event)">
+                        <div class="form-group">
+                            <label>Seleziona l'Azienda da Rimuovere Definitivamente</label>
+                            <select id="delete-select-company" required>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Elimina Azienda Selezionata</button>
+                    </form>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-receipt"></i> Gestione Stato Codici Acquisto Emanati</h2>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="filter-btn-group">
+                            <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="setOrderFilter('all')">Tutti</button>
+                            <button class="btn btn-warning" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="setOrderFilter('In attesa')">Solo In Attesa</button>
+                            <button class="btn btn-success" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="setOrderFilter('Completato')">Solo Completati</button>
+                            <button class="btn btn-danger" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="setOrderFilter('Annullato')">Solo Annullati</button>
+                        </div>
+                        
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem; color:#ef4444; border-color:#ef4444;" onclick="clearOldOrders('Annullato')">
+                                <i class="fa-solid fa-eraser"></i> Pulisci Annullati
+                            </button>
+                            <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem; color:#10b981; border-color:#10b981;" onclick="clearOldOrders('Completato')">
+                                <i class="fa-solid fa-check"></i> Pulisci Completati
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Codice</th>
+                                    <th>Data & Ora</th>
+                                    <th>Utente</th>
+                                    <th>Azienda</th>
+                                    <th>Quantità</th>
+                                    <th>Totale</th>
+                                    <th>Stato Attuale</th>
+                                    <th>Modifica Stato</th>
+                                    <th>Azione</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-orders-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-users"></i> Gestione Account Registrati</h2>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="flex-grow: 1; max-width: 350px;">
+                            <input type="text" id="search-user-input" placeholder="🔍 Cerca utente..." oninput="renderAdmin()" style="padding: 0.5rem 0.8rem;">
+                        </div>
+                        
+                        <button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem; color:#f59e0b; border-color:#f59e0b;" onclick="clearUsersWithoutStocks()">
+                            <i class="fa-solid fa-user-slash"></i> Pulisci Account Senza Azioni
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Ruolo</th>
+                                    <th>Azienda Collegata</th>
+                                    <th>Portafoglio Attuale</th>
+                                    <th>Note Admin</th>
+                                    <th>Azione Nota</th>
+                                    <th>Elimina</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-list-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-hand-holding-dollar"></i> Assegna o Rimuovi Azioni da un Utente</h2>
+                    <form onsubmit="adminManageStocks(event)">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="form-group">
+                                <label>Operazione</label>
+                                <select id="assign-op-select">
+                                    <option value="add">➕ Aggiungi / Assegna Azioni</option>
+                                    <option value="remove">➖ Rimuovi / Detrai Azioni</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Seleziona Utente</label>
+                                <select id="assign-user-select" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Seleziona Azienda</label>
+                                <select id="assign-comp-select" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantità Azioni</label>
+                                <input type="number" id="assign-qty" min="1" placeholder="Es. 5" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Esegui Operazione</button>
+                    </form>
+                </div>
+
+                <div class="admin-box">
+                    <h2><i class="fa-solid fa-key"></i> Password & Nuovi Account</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div>
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Cambia Password Utente</h3>
+                            <form onsubmit="adminChangePassword(event)">
+                                <div class="form-group">
+                                    <label>Utente</label>
+                                    <select id="pwd-user-select" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nuova Password</label>
+                                    <input type="text" id="pwd-new-input" placeholder="Nuova password..." required>
+                                </div>
+                                <button type="submit" class="btn btn-warning"><i class="fa-solid fa-lock-open"></i> Aggiorna Password</button>
+                            </form>
+                        </div>
+
+                        <div>
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Crea Nuovo Account</h3>
+                            <form onsubmit="adminCreateUser(event)">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="new-user-name" placeholder="Es. Mario" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" id="new-user-pwd" placeholder="Password..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ruolo Account</label>
+                                    <select id="new-user-role">
+                                        <option value="user">Utente Standard (Investitore)</option>
+                                        <option value="company_owner">Possessore Azienda Quotata</option>
+                                        <option value="admin">Amministratore</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Crea Account</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL QUOTAZIONE IN BORSA -->
+    <div id="quote-request-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('quote-request-modal')">&times;</span>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 3rem; color: #f59e0b; margin-bottom: 0.5rem;"><i class="fa-solid fa-building-circle-check"></i></div>
+                <h2 style="font-size: 1.6rem; font-weight: 800;">Richiedi Quotazione in Borsa</h2>
+            </div>
+            <p style="color: var(--text-muted); line-height: 1.6; text-align: center; margin-bottom: 1.5rem;">
+                Vuoi inserire la tua impresa sul mercato azionario privato di ZeroCity? Contatta il Direttore Generale della Trading Bank Zero per sottoporre il bilancio aziendale a valutazione.
+            </p>
+            <a href="https://t.me/Meslate" target="_blank" class="btn btn-telegram" style="width: 100%; text-align: center; justify-content: center; font-size: 1rem; padding: 0.9rem;">
+                <i class="fa-brands fa-telegram"></i> CONTATTA @Meslate SU TELEGRAM
+            </a>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRAZIONE -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('register-modal')">&times;</span>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 2.5rem; color: #38bdf8; margin-bottom: 0.5rem;"><i class="fa-brands fa-telegram"></i></div>
+                <h2 style="font-size: 1.5rem; font-weight: 800;">Richiedi Registrazione Account</h2>
+            </div>
+            <p style="color: var(--text-muted); line-height: 1.6; text-align: center; margin-bottom: 1.5rem;">
+                Contatta il Direttore su Telegram per ottenere un account su Trading Bank Zero.
+            </p>
+            <a href="https://t.me/Meslate" target="_blank" class="btn btn-telegram" style="width: 100%; text-align: center; justify-content: center;">
+                <i class="fa-brands fa-telegram"></i> VAI A TELEGRAM (@Meslate)
+            </a>
+        </div>
+    </div>
+
+    <!-- MODAL LOGIN -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
+            <h2 style="font-size: 1.6rem; font-weight: 800; text-align:center; margin-bottom: 1.5rem;">Accedi al Portale</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Nome Utente</label>
+                    <input type="text" id="login-username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;"><i class="fa-solid fa-right-to-bracket"></i> Accedi</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL GRAFICO -->
+    <div id="chart-modal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-btn" onclick="closeModal('chart-modal')">&times;</span>
+            <h2 id="chart-modal-title" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #38bdf8;">Andamento Azienda</h2>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="companyStockChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARRELLO -->
+    <div id="buy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('buy-modal')">&times;</span>
+            <div id="buy-modal-body"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Trading Bank Zero - Impresa privata di Borsa e Finanza per ZeroRoleplay.</p>
+    </footer>
+
+    <!-- SCRIPT JS LOGICA -->
+    <script>
+        const API_URL = '/.netlify/functions/api';
+        let currentUser = null;
+        let stockChartInstance = null;
+        let currentOrderFilter = 'all';
+
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast-card toast-${type}`;
+
+            let iconClass = 'fa-circle-check';
+            if (type === 'error') iconClass = 'fa-circle-xmark';
+            if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+            if (type === 'info') iconClass = 'fa-circle-info';
+
+            const closeFunc = () => {
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            };
+
+            toast.innerHTML = `
+                <button onclick="this.closest('.toast-card').remove()" style="position:absolute; top:8px; right:8px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; opacity:0.7; z-index:10;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="toast-content">
+                    <i class="fa-solid ${iconClass} toast-icon"></i>
+                    <div class="toast-body">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                </div>
+                <div class="toast-progress">
+                    <div class="toast-progress-bar"></div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) closeFunc();
+            }, 5000);
+        }
+
+        async function apiFetch(endpoint, method = 'GET', data = null) {
+            try {
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (data) options.body = JSON.stringify(data);
+                const res = await fetch(`${API_URL}${endpoint}`, options);
+                return await res.json();
+            } catch (err) {
+                console.error("Errore API:", err);
+                return null;
+            }
+        }
+
+        async function initData() {
+            const users = await apiFetch('/users');
+            if (!users || users.length === 0) {
+                await apiFetch('/users', 'POST', { username: 'vMeslate', password: 'ZeroBank2026!', role: 'admin', portfolio: {}, note: 'Account Amministratore Principale', ownedCompany: '' });
+            }
+        }
+        initData();
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            const navLink = document.getElementById(`link-${sectionId}`);
+            if (navLink) navLink.classList.add('active');
+
+            if (sectionId === 'quotazioni') renderCompanies();
+            if (sectionId === 'dashboard') renderDashboard();
+            if (sectionId === 'admin') renderAdmin();
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+            const users = await apiFetch('/users') || [];
+
+            const found = users.find(user => user.username.toLowerCase() === u.toLowerCase() && user.password === p);
+
+            if (found) {
+                currentUser = found;
+                closeModal('login-modal');
+                updateNav();
+                showSection('dashboard');
+                showToast('Login Effettuato', `Benvenuto di nuovo, ${currentUser.username}!`, 'success');
+            } else {
+                showToast('Accesso Negato', 'Nome utente o password errati.', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            updateNav();
+            showSection('chi-siamo');
+            showToast('Disconnessione', 'Hai effettuato il logout con successo.', 'info');
+        }
+
+        function updateNav() {
+            const authBtns = document.getElementById('auth-buttons');
+            const navDash = document.getElementById('nav-dashboard');
+            const navAdmin = document.getElementById('nav-admin');
+
+            if (currentUser) {
+                authBtns.innerHTML = `<button class="btn btn-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Esci (${currentUser.username})</button>`;
+                navDash.style.display = 'block';
+                navAdmin.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+            } else {
+                authBtns.innerHTML = `
+                    <button class="btn btn-outline" onclick="openModal('register-modal')"><i class="fa-solid fa-user-plus"></i> Registrati</button>
+                    <button class="btn btn-primary" onclick="openModal('login-modal')"><i class="fa-solid fa-right-to-bracket"></i> Accedi</button>
+                `;
+                navDash.style.display = 'none';
+                navAdmin.style.display = 'none';
+            }
+        }
+
+        async function renderCompanies() {
+            const companies = await apiFetch('/companies') || [];
+            const tbody = document.getElementById('companies-table');
+            tbody.innerHTML = '';
+
+            if (companies.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 2rem;">Al momento non è presente alcuna azienda quotata in borsa.</td></tr>`;
+                return;
+            }
+
+            companies.forEach(c => {
+                const growthVal = parseFloat(c.growth || 0);
+                const growthClass = growthVal >= 0 ? 'positive' : 'negative';
+                const growthSign = growthVal >= 0 ? '+' : '';
+
+                const buyBtn = c.stocks > 0 
+                    ? `<button class="btn btn-success" onclick="openBuyModal('${c.id}')"><i class="fa-solid fa-cart-shopping"></i> ACQUISTA</button>`
+                    : `<span style="color: var(--danger); font-weight:700;">ESAURITE</span>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>€${parseFloat(c.valuation).toLocaleString()}</td>
+                        <td><span class="code-pill">${c.stocks}</span></td>
+                        <td>€${parseFloat(c.price).toLocaleString()}</td>
+                        <td class="${growthClass}">${growthSign}${growthVal.toFixed(2)}%</td>
+                        <td><button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="showCompanyChart('${c.id}')"><i class="fa-solid fa-chart-line"></i> Grafico</button></td>
+                        <td>${buyBtn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function showCompanyChart(companyId) {
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === companyId);
+            if (!comp) return;
+
+            document.getElementById('chart-modal-title').innerText = `Andamento - ${comp.name}`;
+            const history = comp.history || [comp.valuation];
+            const labels = history.map((_, idx) => `Punto ${idx + 1}`);
+
+            openModal('chart-modal');
+            const ctx = document.getElementById('companyStockChart').getContext('2d');
+
+            if (stockChartInstance) stockChartInstance.destroy();
+
+            stockChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Valutazione (€)',
+                        data: history,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        async function showOwnerCompanyChart() {
+            if (!currentUser || !currentUser.ownedCompany) return;
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.name === currentUser.ownedCompany);
+            if (comp) showCompanyChart(comp.id);
+        }
+
+        async function openBuyModal(companyId) {
+            if (!currentUser) {
+                showToast('Accesso Richiesto', 'Devi prima accedere al tuo account per acquistare azioni!', 'warning');
+                openModal('login-modal');
+                return;
+            }
+
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === companyId);
+
+            const modalBody = document.getElementById('buy-modal-body');
+            modalBody.innerHTML = `
+                <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #38bdf8;">Acquista Azioni - ${comp.name}</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.25rem;">Prezzo: €${comp.price} | Disponibili: ${comp.stocks}</p>
+                <div class="form-group">
+                    <label>Quantità:</label>
+                    <input type="number" id="buy-qty" min="1" max="${comp.stocks}" value="1" oninput="updateBuyTotal(${comp.price})">
+                </div>
+                <p style="font-size: 1.4rem; font-weight:800; color:#34d399; margin-bottom: 1rem;" id="buy-total-price">Totale: €${comp.price}</p>
+                <button class="btn btn-success" style="width:100%;" onclick="confirmPurchase('${comp.id}')">Conferma ed Emana Codice</button>
+            `;
+            openModal('buy-modal');
+        }
+
+        function updateBuyTotal(price) {
+            const qty = parseInt(document.getElementById('buy-qty').value) || 1;
+            document.getElementById('buy-total-price').innerText = `Totale: €${(qty * price).toLocaleString()}`;
+        }
+
+        async function confirmPurchase(companyId) {
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === companyId);
+            const qty = parseInt(document.getElementById('buy-qty').value) || 1;
+            const code = Math.floor(10000000 + Math.random() * 90000000).toString();
+            
+            const now = new Date();
+            const timestamp = now.toLocaleDateString('it-IT') + ', ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+
+            const newOrder = { 
+                id: 'ord_' + Date.now(),
+                code: code, 
+                date: timestamp,
+                user: currentUser.username, 
+                company: comp.name, 
+                qty: qty, 
+                total: qty * comp.price, 
+                status: 'In attesa' 
+            };
+            await apiFetch('/orders', 'POST', newOrder);
+
+            const modalBody = document.getElementById('buy-modal-body');
+            modalBody.innerHTML = `
+                <div style="text-align: center;">
+                    <h2 style="color: #34d399; margin-bottom:0.5rem;">Codice Acquisto Emanato!</h2>
+                    <p style="margin-bottom:0.3rem; color:var(--text-muted);">Codice d'ordine unico:</p>
+                    <div style="background:#0f172a; padding:1rem; border-radius:10px; font-size:2rem; font-weight:800; color:#38bdf8; margin-bottom:0.8rem;">${code}</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;"><i class="fa-regular fa-clock"></i> ${timestamp}</p>
+                    <a href="https://t.me/Meslate" target="_blank" class="btn btn-telegram" style="width:100%; text-align:center;">INVIA A @Meslate</a>
+                </div>
+            `;
+            showToast('Ordine Emanato', `Generato il codice ${code} il ${timestamp}`, 'success');
+        }
+
+        async function renderDashboard() {
+            if (!currentUser) return;
+            document.getElementById('user-display-name').innerText = currentUser.username;
+            
+            let roleTitle = 'Investitore';
+            if (currentUser.role === 'admin') roleTitle = 'Amministratore';
+            if (currentUser.role === 'company_owner') roleTitle = 'Possessore di Azienda Quotata';
+            document.getElementById('user-display-role').innerText = roleTitle;
+
+            const ownerPanel = document.getElementById('company-owner-panel');
+            if (currentUser.ownedCompany) {
+                ownerPanel.style.display = 'block';
+                document.getElementById('owner-company-name').innerText = currentUser.ownedCompany;
+
+                const companies = await apiFetch('/companies') || [];
+                const myComp = companies.find(c => c.name === currentUser.ownedCompany) || { valuation: 0, price: 0, stocks: 0 };
+
+                document.getElementById('owner-company-val').innerText = `€${parseFloat(myComp.valuation || 0).toLocaleString()}`;
+                document.getElementById('owner-company-price').innerText = `€${parseFloat(myComp.price || 0).toLocaleString()}`;
+                document.getElementById('owner-company-stocks').innerText = myComp.stocks || 0;
+
+                const users = await apiFetch('/users') || [];
+                const tbodyInv = document.getElementById('company-investors-table');
+                tbodyInv.innerHTML = '';
+
+                let foundInvestors = false;
+                users.forEach(u => {
+                    if (u.portfolio && u.portfolio[currentUser.ownedCompany] > 0) {
+                        foundInvestors = true;
+                        const userQty = u.portfolio[currentUser.ownedCompany];
+                        const totalVal = userQty * myComp.price;
+                        tbodyInv.innerHTML += `
+                            <tr>
+                                <td><strong>${u.username}</strong></td>
+                                <td><span class="code-pill">${userQty}</span></td>
+                                <td>€${totalVal.toLocaleString()}</td>
+                                <td><strong style="color:#38bdf8;">${((totalVal / (myComp.valuation || 1)) * 100).toFixed(2)}%</strong></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if (!foundInvestors) {
+                    tbodyInv.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Nessun cittadino possiede attualmente azioni di ${currentUser.ownedCompany}.</td></tr>`;
+                }
+            } else {
+                ownerPanel.style.display = 'none';
+            }
+
+            const tbodyPort = document.getElementById('user-portfolio-table');
+            tbodyPort.innerHTML = '';
+            const companies = await apiFetch('/companies') || [];
+            const userPortfolio = currentUser.portfolio || {};
+
+            let hasAssets = false;
+            for (const [compName, qty] of Object.entries(userPortfolio)) {
+                if (qty > 0) {
+                    hasAssets = true;
+                    const comp = companies.find(c => c.name === compName) || { price: 0 };
+                    tbodyPort.innerHTML += `
+                        <tr>
+                            <td><strong>${compName}</strong></td>
+                            <td><span class="code-pill">${qty}</span></td>
+                            <td>€${comp.price}</td>
+                            <td><strong style="color:#34d399;">€${(qty * comp.price).toLocaleString()}</strong></td>
+                            <td><a href="https://t.me/Meslate" target="_blank" class="btn btn-telegram" style="padding:0.3rem 0.6rem; font-size:0.8rem;">METTI IN VENDITA</a></td>
+                        </tr>
+                    `;
+                }
+            }
+            if (!hasAssets) tbodyPort.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Nessuna azione posseduta.</td></tr>`;
+
+            const tbodyOrd = document.getElementById('user-orders-table');
+            tbodyOrd.innerHTML = '';
+            const allOrders = await apiFetch('/orders') || [];
+            const myOrders = allOrders.filter(o => o.user === currentUser.username);
+
+            if (myOrders.length === 0) {
+                tbodyOrd.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Nessun codice emanato.</td></tr>`;
+            } else {
+                myOrders.forEach(o => {
+                    tbodyOrd.innerHTML += `
+                        <tr>
+                            <td><span class="code-pill">${o.code}</span></td>
+                            <td><span class="date-pill"><i class="fa-regular fa-clock"></i> ${o.date || 'N/D'}</span></td>
+                            <td>${o.company}</td>
+                            <td>${o.qty}</td>
+                            <td>€${o.total.toLocaleString()}</td>
+                            <td><strong>${o.status}</strong></td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function setOrderFilter(filter) {
+            currentOrderFilter = filter;
+            renderAdmin();
+        }
+
+        async function clearOldOrders(statusToClear) {
+            let orders = await apiFetch('/orders') || [];
+            for (let o of orders) {
+                if (o.status === statusToClear) {
+                    await apiFetch('/orders', 'DELETE', { id: o.id });
+                }
+            }
+            renderAdmin();
+            showToast('Pulizia Effettuata', `Rimossi ordini con stato "${statusToClear}".`, 'info');
+        }
+
+        async function deleteSingleOrder(orderId) {
+            await apiFetch('/orders', 'DELETE', { id: orderId });
+            renderAdmin();
+            showToast('Ordine Eliminato', 'Il codice d\'acquisto è stato rimosso dalla lista.', 'error');
+        }
+
+        async function deleteSingleUser(username) {
+            if (username === 'vMeslate') {
+                showToast('Operazione Negata', 'Non puoi eliminare l\'account Amministratore Principale!', 'error');
+                return;
+            }
+            await apiFetch('/users', 'DELETE', { username });
+            renderAdmin();
+            showToast('Account Eliminato', `L'account di ${username} è stato rimosso.`, 'error');
+        }
+
+        async function clearUsersWithoutStocks() {
+            let users = await apiFetch('/users') || [];
+            let removedCount = 0;
+
+            for (let u of users) {
+                if (u.role === 'admin' || u.username === 'vMeslate' || u.ownedCompany) continue;
+                let hasStocks = false;
+                if (u.portfolio) {
+                    for (const qty of Object.values(u.portfolio)) {
+                        if (qty > 0) { hasStocks = true; break; }
+                    }
+                }
+                if (!hasStocks) {
+                    await apiFetch('/users', 'DELETE', { username: u.username });
+                    removedCount++;
+                }
+            }
+
+            renderAdmin();
+            showToast('Pulizia Account', `Eliminati ${removedCount} account inattivi senza azioni.`, 'info');
+        }
+
+        async function adminAssignCompanyOwner(e) {
+            e.preventDefault();
+            const username = document.getElementById('owner-user-select').value;
+            const companyName = document.getElementById('owner-company-select').value;
+
+            let users = await apiFetch('/users') || [];
+            const u = users.find(x => x.username === username);
+
+            if (u) {
+                u.ownedCompany = companyName;
+                if (u.role !== 'admin') u.role = 'company_owner';
+                await apiFetch('/users', 'POST', u);
+
+                if (currentUser && currentUser.username === username) currentUser = u;
+                renderAdmin();
+                showToast('Titolare Assegnato', `${username} è ora registrato come Titolare di ${companyName}!`, 'success');
+            }
+        }
+
+        async function renderAdmin() {
+            const companies = await apiFetch('/companies') || [];
+            const users = await apiFetch('/users') || [];
+            let orders = await apiFetch('/orders') || [];
+
+            const editSelect = document.getElementById('edit-select-company');
+            const deleteSelect = document.getElementById('delete-select-company');
+            const ownerCompSelect = document.getElementById('owner-company-select');
+
+            editSelect.innerHTML = '<option value="">-- Seleziona un\'Azienda --</option>';
+            deleteSelect.innerHTML = '<option value="">-- Seleziona un\'Azienda --</option>';
+            ownerCompSelect.innerHTML = '<option value="">-- Seleziona Azienda --</option>';
+
+            companies.forEach(c => {
+                editSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                deleteSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                ownerCompSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+
+            const searchVal = (document.getElementById('search-user-input')?.value || '').toLowerCase();
+            const tbodyUsers = document.getElementById('admin-users-list-table');
+            tbodyUsers.innerHTML = '';
+
+            const filteredUsers = users.filter(u => u.username.toLowerCase().includes(searchVal) || u.role.toLowerCase().includes(searchVal));
+
+            if (filteredUsers.length === 0) {
+                tbodyUsers.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:1rem;">Nessun utente trovato.</td></tr>`;
+            } else {
+                filteredUsers.forEach((u) => {
+                    const realIndex = users.findIndex(item => item.username === u.username);
+                    let pSummary = [];
+                    if (u.portfolio) {
+                        for (const [comp, qty] of Object.entries(u.portfolio)) {
+                            if (qty > 0) pSummary.push(`${comp}: ${qty}`);
+                        }
+                    }
+
+                    const deleteBtn = u.role === 'admin' 
+                        ? `<span style="color:var(--text-muted); font-size:0.8rem;">Protetto</span>`
+                        : `<button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="deleteSingleUser('${u.username}')"><i class="fa-solid fa-user-xmark"></i></button>`;
+
+                    tbodyUsers.innerHTML += `
+                        <tr>
+                            <td><strong>${u.username}</strong></td>
+                            <td>${u.role}</td>
+                            <td><strong style="color:#f59e0b;">${u.ownedCompany || 'Nessuna'}</strong></td>
+                            <td><span style="color:#38bdf8;">${pSummary.join(', ') || 'Nessuna'}</span></td>
+                            <td><textarea id="note-field-${realIndex}" class="note-input">${u.note || ''}</textarea></td>
+                            <td><button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="saveUserNote('${u.username}', ${realIndex})"><i class="fa-solid fa-floppy-disk"></i> Salva</button></td>
+                            <td>${deleteBtn}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const tbodyOrd = document.getElementById('admin-orders-table');
+            tbodyOrd.innerHTML = '';
+
+            let filteredOrders = orders;
+            if (currentOrderFilter !== 'all') {
+                filteredOrders = orders.filter(o => o.status === currentOrderFilter);
+            }
+
+            if (filteredOrders.length === 0) {
+                tbodyOrd.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-muted); padding:1.5rem;">Nessun ordine trovato per questo filtro.</td></tr>`;
+            } else {
+                filteredOrders.forEach((o) => {
+                    tbodyOrd.innerHTML += `
+                        <tr>
+                            <td><span class="code-pill">${o.code}</span></td>
+                            <td><span class="date-pill"><i class="fa-regular fa-clock"></i> ${o.date || 'N/D'}</span></td>
+                            <td>${o.user}</td>
+                            <td>${o.company}</td>
+                            <td>${o.qty}</td>
+                            <td>€${o.total.toLocaleString()}</td>
+                            <td><strong>${o.status}</strong></td>
+                            <td>
+                                <select onchange="updateOrderStatus('${o.id}', this.value)" style="padding:0.3rem;">
+                                    <option value="In attesa" ${o.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
+                                    <option value="Completato" ${o.status === 'Completato' ? 'selected' : ''}>Completato</option>
+                                    <option value="Annullato" ${o.status === 'Annullato' ? 'selected' : ''}>Annullato</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="deleteSingleOrder('${o.id}')"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const selectUser = document.getElementById('assign-user-select');
+            const selectPwd = document.getElementById('pwd-user-select');
+            const selectComp = document.getElementById('assign-comp-select');
+            const ownerUserSelect = document.getElementById('owner-user-select');
+
+            selectUser.innerHTML = '';
+            selectPwd.innerHTML = '';
+            ownerUserSelect.innerHTML = '<option value="">-- Seleziona Utente --</option>';
+
+            users.forEach(u => {
+                selectUser.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+                selectPwd.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+                ownerUserSelect.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+            });
+
+            selectComp.innerHTML = '';
+            companies.forEach(c => {
+                selectComp.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+        }
+
+        async function adminCreateCompany(e) {
+            e.preventDefault();
+            const name = document.getElementById('add-comp-name').value.trim();
+            const valuation = parseFloat(document.getElementById('add-comp-val').value);
+            const stocks = parseInt(document.getElementById('add-comp-stocks').value);
+            const price = parseFloat(document.getElementById('add-comp-price').value);
+
+            const newComp = {
+                id: 'c_' + Date.now(),
+                name: name,
+                valuation: valuation,
+                stocks: stocks,
+                price: price,
+                growth: 0,
+                history: [valuation]
+            };
+
+            await apiFetch('/companies', 'POST', newComp);
+            
+            document.getElementById('add-comp-name').value = '';
+            document.getElementById('add-comp-val').value = '';
+            document.getElementById('add-comp-stocks').value = '';
+            document.getElementById('add-comp-price').value = '';
+
+            renderAdmin();
+            renderCompanies();
+            showToast('Azienda Quotata', `L'azienda ${name} è stata aggiunta alla Borsa!`, 'success');
+        }
+
+        async function populateEditCompanyFields() {
+            const id = document.getElementById('edit-select-company').value;
+            if (!id) {
+                document.getElementById('edit-field-name').value = '';
+                document.getElementById('edit-field-val').value = '';
+                document.getElementById('edit-field-stocks').value = '';
+                document.getElementById('edit-field-price').value = '';
+                return;
+            }
+
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === id);
+            if (!comp) return;
+
+            document.getElementById('edit-field-name').value = comp.name;
+            document.getElementById('edit-field-val').value = comp.valuation;
+            document.getElementById('edit-field-stocks').value = comp.stocks;
+            document.getElementById('edit-field-price').value = comp.price;
+        }
+
+        async function adminSubmitCompanyEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-select-company').value;
+            if (!id) {
+                showToast('Seleziona Azienda', 'Devi prima selezionare un\'azienda dal menu a tendina!', 'warning');
+                return;
+            }
+
+            const name = document.getElementById('edit-field-name').value.trim();
+            const newVal = parseFloat(document.getElementById('edit-field-val').value);
+            const stocks = parseInt(document.getElementById('edit-field-stocks').value);
+            const price = parseFloat(document.getElementById('edit-field-price').value);
+
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === id);
+
+            if (comp) {
+                const oldVal = comp.valuation;
+                let growth = comp.growth || 0;
+                if (oldVal > 0) {
+                    growth = ((newVal - oldVal) / oldVal) * 100;
+                }
+                const history = comp.history || [oldVal];
+                history.push(newVal);
+
+                const updatedComp = { ...comp, name, valuation: newVal, stocks, price, growth, history };
+                await apiFetch('/companies', 'POST', updatedComp);
+
+                renderAdmin();
+                renderCompanies();
+                showToast('Azienda Modificata', `Dati di ${name} aggiornati con successo.`, 'success');
+            }
+        }
+
+        async function adminSubmitCompanyDelete(e) {
+            e.preventDefault();
+            const id = document.getElementById('delete-select-company').value;
+            if (!id) {
+                showToast('Seleziona Azienda', 'Seleziona un\'azienda da eliminare.', 'warning');
+                return;
+            }
+
+            const companies = await apiFetch('/companies') || [];
+            const comp = companies.find(c => c.id === id);
+            const compName = comp ? comp.name : '';
+
+            await apiFetch('/companies', 'DELETE', { id });
+
+            renderAdmin();
+            renderCompanies();
+            showToast('Azienda Eliminata', `L'azienda ${compName} è stata rimossa dalla Borsa.`, 'error');
+        }
+
+        async function saveUserNote(username, idx) {
+            const text = document.getElementById(`note-field-${idx}`).value;
+            let users = await apiFetch('/users') || [];
+            const u = users.find(x => x.username === username);
+            if (u) {
+                u.note = text;
+                await apiFetch('/users', 'POST', u);
+                showToast('Nota Salvata', `Nota aggiornata per l'utente ${username}.`, 'success');
+            }
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            let orders = await apiFetch('/orders') || [];
+            const o = orders.find(x => x.id === orderId);
+            if (o) {
+                o.status = newStatus;
+                await apiFetch('/orders', 'POST', o);
+                renderAdmin();
+                showToast('Stato Aggiornato', `Codice ${o.code} impostato su "${newStatus}".`, 'info');
+            }
+        }
+
+        async function adminManageStocks(e) {
+            e.preventDefault();
+            const op = document.getElementById('assign-op-select').value;
+            const username = document.getElementById('assign-user-select').value;
+            const companyName = document.getElementById('assign-comp-select').value;
+            const qty = parseInt(document.getElementById('assign-qty').value);
+
+            let users = await apiFetch('/users') || [];
+            const u = users.find(x => x.username === username);
+
+            if (u) {
+                if (!u.portfolio) u.portfolio = {};
+                const currentQty = u.portfolio[companyName] || 0;
+
+                if (op === 'add') {
+                    u.portfolio[companyName] = currentQty + qty;
+                    showToast('Azioni Assegnate', `Aggiunte ${qty} azioni di ${companyName} a ${username}.`, 'success');
+                } else {
+                    u.portfolio[companyName] = Math.max(0, currentQty - qty);
+                    showToast('Azioni Rimosse', `Rimosse ${qty} azioni di ${companyName} da ${username}.`, 'warning');
+                }
+
+                await apiFetch('/users', 'POST', u);
+                if (currentUser && currentUser.username === username) currentUser = u;
+                document.getElementById('assign-qty').value = '';
+                renderAdmin();
+            }
+        }
+
+        async function adminChangePassword(e) {
+            e.preventDefault();
+            const username = document.getElementById('pwd-user-select').value;
+            const newPwd = document.getElementById('pwd-new-input').value.trim();
+
+            let users = await apiFetch('/users') || [];
+            const u = users.find(x => x.username === username);
+            if (u) {
+                u.password = newPwd;
+                await apiFetch('/users', 'POST', u);
+                document.getElementById('pwd-new-input').value = '';
+                showToast('Password Aggiornata', `Nuova password salvata per ${username}.`, 'success');
+            }
+        }
+
+        async function adminCreateUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('new-user-name').value.trim();
+            const password = document.getElementById('new-user-pwd').value.trim();
+            const role = document.getElementById('new-user-role').value;
+
+            let users = await apiFetch('/users') || [];
+            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('Errore Creazione', 'Nome utente già in uso!', 'error');
+                return;
+            }
+
+            const newUser = { username, password, role, portfolio: {}, note: '', ownedCompany: '' };
+            await apiFetch('/users', 'POST', newUser);
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pwd').value = '';
+            renderAdmin();
+            showToast('Account Creato', `Registrato account: ${username}`, 'success');
+        }
+    </script>
+</body>
+</html>
